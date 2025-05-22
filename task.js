@@ -22,9 +22,9 @@ app.post("/", (req, res) => {
 
 // create News Post
 app.post("/api/news/create", (req, res) => {
-    const { title, content, author, datePublished } = req.body;
+    const { title, content, author, datePublished , description, Source, image} = req.body;
 
-    if (!title || !content || !author || !datePublished) {
+    if (!title || !content || !author || !datePublished || !description || !Source || !image) {
         return res.status(400).send({
             success: false,
             error: "All fields are required"
@@ -36,7 +36,10 @@ app.post("/api/news/create", (req, res) => {
         title,
         content,
         author,
-        datePublished
+        datePublished,
+        description,
+        Source,
+        image
     };
 
     newsPosts.push(newPost);
@@ -89,8 +92,6 @@ app.put("/api/news/update/:id", (req, res) => {
         });
     }
 
-    Object.assign(post, req.body);
-
     res.send({
         success: true,
         message: "News post updated",
@@ -100,25 +101,26 @@ app.put("/api/news/update/:id", (req, res) => {
 
 // delete News Post
 app.delete("/api/news/delete/:id", (req, res) => {
-    const index = newsPosts.findIndex(n => n.id === parseInt(id));
+  const id = parseInt(req.params.id);
+  const index = newsPosts.findIndex(post => post.id === id); 
 
-    if (index === -1) {
-        return res.status(404).send({
-            success: false,
-            message: "News post not found"
-        });
-    }
-
-    const deleted = newsPosts.splice(index, 1);
-
-    res.send({
-        success: true,
-        message: "News post deleted",
-        data: deleted[0]
+  if (index === -1) {
+    return res.status(404).send({
+      success: false,
+      message: "News not found"
     });
+  }
+
+  const deleted = newsPosts.splice(index, 1); 
+  res.send({
+    success: true,
+    message: "News deleted",
+    data: deleted[0]
+  });
 });
 
-// filter News by Author
+
+// ilter News by Author
 app.get("/api/news/author", (req, res) => {
     const { name } = req.query;
     const result = newsPosts.filter(post => post.author?.toLowerCase() === name?.toLowerCase());
