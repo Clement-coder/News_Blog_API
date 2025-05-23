@@ -29,7 +29,13 @@ app.post("/api/news/create", (req, res) => {
             success: false,
             error: "All fields are required"
         });
-    }
+    } else if (newsPosts.find(post => post.title === title)) {
+    return res.status(400).send({
+        success: false,
+        error: "Cannot create post, title already dey"
+    });
+}
+
 
     const newPost = {
         id: generateId(newsPosts),
@@ -91,6 +97,17 @@ app.put("/api/news/update/:id", (req, res) => {
             message: "News post not found"
         });
     }
+
+    const { title, content, author, datePublished , description, Source, image} = req.body;    
+
+    if (title) post.title = title
+    if (content) post.content = content
+    if (author) post.author = author
+    if (datePublished) post.datePublished = datePublished
+    if (description) post.description = description
+    if (Source) post.Source = Source
+    if (image) post.image = image
+
 
     res.send({
         success: true,
